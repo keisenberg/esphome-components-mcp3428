@@ -9,7 +9,7 @@ static const char *const TAG = "mcp3428.sensor";
 
 void MCP3428Sensor::setup() {
   ESP_LOGCONFIG(TAG, "Setting up MCP3428 sensor...");
-  this->unit_of_measurement_ = "";  // Set unit to "" for raw ADC values
+  this->unit_of_measurement_ = "count";  // Set unit to "count" for raw ADC values
 }
 
 void MCP3428Sensor::dump_config() {
