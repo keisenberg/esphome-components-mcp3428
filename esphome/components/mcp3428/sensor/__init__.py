@@ -1,15 +1,18 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor
+from esphome.components import sensor, voltage_sampler
 from esphome.const import (
     CONF_GAIN,
     CONF_MULTIPLEXER,
     CONF_RESOLUTION,
+    DEVICE_CLASS_VOLTAGE,
     STATE_CLASS_MEASUREMENT,
+    UNIT_VOLT,
 )
 from .. import mcp3428_ns, MCP3428Component, CONF_MCP3428_ID
 
 CODEOWNERS = ["@mdop"]
+AUTO_LOAD = ["voltage_sampler"]
 DEPENDENCIES = ["mcp3428"]
 
 MCP3428Multiplexer = mcp3428_ns.enum("MCP3428Multiplexer")
@@ -35,28 +38,33 @@ RESOLUTION = {
     16: MCP3428Resolution.MCP3428_16_BITS,
 }
 
+
 MCP3428Sensor = mcp3428_ns.class_(
-    "MCP3428Sensor", sensor.Sensor, cg.PollingComponent
+    "MCP3428Sensor", sensor.Sensor, cg.PollingComponent, voltage_sampler.VoltageSampler
 )
 
-CONFIG_SCHEMA = cv.Schema(
-    {
-        cv.GenerateID(): cv.declare_id(MCP3428Sensor),
-        cv.Required(CONF_MCP3428_ID): cv.use_id(MCP3428Component),
-        cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, int=True),
-        cv.Optional(CONF_GAIN, default=1): cv.enum(GAIN, int=True),
-        cv.Optional(CONF_RESOLUTION, default=16): cv.enum(RESOLUTION, int=True),
-        cv.Optional("name"): cv.string,
-        cv.Optional("unit_of_measurement", default="count"): cv.string,
-        cv.Optional("accuracy_decimals", default=0): cv.int_,
-        cv.Optional("state_class", default=STATE_CLASS_MEASUREMENT): cv.string,
-        cv.Optional("update_interval", default="60s"): cv.update_interval,
-        cv.Optional("filters"): cv.ensure_list(cv.returning_lambda),
-    }
-).extend(cv.polling_component_schema("60s"))
+CONFIG_SCHEMA = (
+    sensor.sensor_schema(
+        MCP3428Sensor,
+        unit_of_measurement=UNIT_VOLT,
+        accuracy_decimals=6,
+        device_class=DEVICE_CLASS_VOLTAGE,
+        state_class=STATE_CLASS_MEASUREMENT,
+    )
+    .extend(
+        {
+            cv.GenerateID(CONF_MCP3428_ID): cv.use_id(MCP3428Component),
+            cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, int=True),
+            cv.Optional(CONF_GAIN, default=1): cv.enum(GAIN, int=True),
+            cv.Optional(CONF_RESOLUTION, default=16): cv.enum(RESOLUTION, int=True),
+        }
+    )
+    .extend(cv.polling_component_schema("60s"))
+)
+
 
 async def to_code(config):
-    var = cg.new_Pvariable(config[CONF_ID])
+    var = await sensor.new_sensor(config)
     await cg.register_component(var, config)
     await cg.register_parented(var, config[CONF_MCP3428_ID])
 
