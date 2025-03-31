@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, voltage_sampler
+from esphome.components import sensor
 from esphome.const import (
     CONF_GAIN,
     CONF_MULTIPLEXER,
@@ -12,7 +12,6 @@ from esphome.const import (
 from .. import mcp3428_ns, MCP3428Component, CONF_MCP3428_ID
 
 CODEOWNERS = ["@mdop"]
-AUTO_LOAD = ["voltage_sampler"]
 DEPENDENCIES = ["mcp3428"]
 
 MCP3428Multiplexer = mcp3428_ns.enum("MCP3428Multiplexer")
@@ -40,7 +39,7 @@ RESOLUTION = {
 
 
 MCP3428Sensor = mcp3428_ns.class_(
-    "MCP3428Sensor", sensor.Sensor, cg.PollingComponent, voltage_sampler.VoltageSampler
+    "MCP3428Sensor", sensor.Sensor, cg.PollingComponent
 )
 
 CONFIG_SCHEMA = (
