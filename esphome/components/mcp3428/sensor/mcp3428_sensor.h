@@ -24,7 +24,7 @@ class MCP3428Sensor : public sensor::Sensor,
   void dump_config() override;
   void update() override;
 
-  float sample() override;
+  float sample();
 
  protected:
   MCP3428Multiplexer multiplexer_;
