@@ -5,9 +5,7 @@ from esphome.const import (
     CONF_GAIN,
     CONF_MULTIPLEXER,
     CONF_RESOLUTION,
-    DEVICE_CLASS_VOLTAGE,
     STATE_CLASS_MEASUREMENT,
-    UNIT_VOLT,
 )
 from .. import mcp3428_ns, MCP3428Component, CONF_MCP3428_ID
 
@@ -45,9 +43,8 @@ MCP3428Sensor = mcp3428_ns.class_(
 CONFIG_SCHEMA = (
     sensor.sensor_schema(
         MCP3428Sensor,
-        unit_of_measurement=UNIT_VOLT,
-        accuracy_decimals=6,
-        device_class=DEVICE_CLASS_VOLTAGE,
+        unit_of_measurement="count",
+        accuracy_decimals=0,
         state_class=STATE_CLASS_MEASUREMENT,
     )
     .extend(
