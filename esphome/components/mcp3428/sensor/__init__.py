@@ -35,33 +35,27 @@ RESOLUTION = {
     16: MCP3428Resolution.MCP3428_16_BITS,
 }
 
-
 MCP3428Sensor = mcp3428_ns.class_(
     "MCP3428Sensor", sensor.Sensor, cg.PollingComponent
 )
 
-CONFIG_SCHEMA = (
-    sensor.sensor_schema(
-        MCP3428Sensor,
-        unit_of_measurement="count",
-        accuracy_decimals=0,
-        device_class=None,
-        state_class=STATE_CLASS_MEASUREMENT,
-    )
-    .extend(
-        {
-            cv.GenerateID(CONF_MCP3428_ID): cv.use_id(MCP3428Component),
-            cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, int=True),
-            cv.Optional(CONF_GAIN, default=1): cv.enum(GAIN, int=True),
-            cv.Optional(CONF_RESOLUTION, default=16): cv.enum(RESOLUTION, int=True),
-        }
-    )
-    .extend(cv.polling_component_schema("60s"))
-)
-
+CONFIG_SCHEMA = cv.Schema(
+    {
+        cv.GenerateID(): cv.declare_id(MCP3428Sensor),
+        cv.Required(CONF_MCP3428_ID): cv.use_id(MCP3428Component),
+        cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, int=True),
+        cv.Optional(CONF_GAIN, default=1): cv.enum(GAIN, int=True),
+        cv.Optional(CONF_RESOLUTION, default=16): cv.enum(RESOLUTION, int=True),
+        cv.Optional("name"): cv.string,
+        cv.Optional("unit_of_measurement", default="count"): cv.string,
+        cv.Optional("accuracy_decimals", default=0): cv.int_,
+        cv.Optional("state_class", default=STATE_CLASS_MEASUREMENT): cv.string,
+        cv.Optional("update_interval", default="60s"): cv.update_interval,
+    }
+).extend(cv.polling_component_schema("60s"))
 
 async def to_code(config):
-    var = await sensor.new_sensor(config)
+    var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await cg.register_parented(var, config[CONF_MCP3428_ID])
 
