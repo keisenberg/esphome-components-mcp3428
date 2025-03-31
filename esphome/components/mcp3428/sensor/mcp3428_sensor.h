@@ -5,7 +5,6 @@
 #include "esphome/core/hal.h"
 
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/voltage_sampler/voltage_sampler.h"
 
 #include "../mcp3428.h"
 
@@ -15,7 +14,6 @@ namespace mcp3428 {
 /// Internal holder class that is in instance of Sensor so that the hub can create individual sensors.
 class MCP3428Sensor : public sensor::Sensor,
                       public PollingComponent,
-                      public voltage_sampler::VoltageSampler,
                       public Parented<MCP3428Component> {
  public:
   void set_multiplexer(MCP3428Multiplexer multiplexer) { this->multiplexer_ = multiplexer; }

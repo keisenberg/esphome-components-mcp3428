@@ -1,73 +1,51 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, voltage_sampler
+from esphome.components import sensor
 from esphome.const import (
-    CONF_GAIN,
-    CONF_MULTIPLEXER,
-    CONF_RESOLUTION,
-    DEVICE_CLASS_VOLTAGE,
-    STATE_CLASS_MEASUREMENT,
-    UNIT_VOLT,
+    CONF_ACCURACY_DECIMALS,
+    CONF_DEVICE_CLASS,
+    CONF_FORCE_UPDATE,
+    CONF_ID,
+    CONF_NAME,
+    CONF_UPDATE_INTERVAL,
 )
-from .. import mcp3428_ns, MCP3428Component, CONF_MCP3428_ID
 
-CODEOWNERS = ["@mdop"]
-AUTO_LOAD = ["voltage_sampler"]
-DEPENDENCIES = ["mcp3428"]
-
-MCP3428Multiplexer = mcp3428_ns.enum("MCP3428Multiplexer")
-MUX = {
-    1: MCP3428Multiplexer.MCP3428_MULTIPLEXER_CHANNEL_1,
-    2: MCP3428Multiplexer.MCP3428_MULTIPLEXER_CHANNEL_2,
-    3: MCP3428Multiplexer.MCP3428_MULTIPLEXER_CHANNEL_3,
-    4: MCP3428Multiplexer.MCP3428_MULTIPLEXER_CHANNEL_4,
-}
-
-MCP3428Gain = mcp3428_ns.enum("MCP3428Gain")
-GAIN = {
-    1: MCP3428Gain.MCP3428_GAIN_1,
-    2: MCP3428Gain.MCP3428_GAIN_2,
-    4: MCP3428Gain.MCP3428_GAIN_4,
-    8: MCP3428Gain.MCP3428_GAIN_8,
-}
-
-MCP3428Resolution = mcp3428_ns.enum("MCP3428Resolution")
-RESOLUTION = {
-    12: MCP3428Resolution.MCP3428_12_BITS,
-    14: MCP3428Resolution.MCP3428_14_BITS,
-    16: MCP3428Resolution.MCP3428_16_BITS,
-}
-
+from .. import mcp3428_ns, MCP3428Component, MCP3428Multiplexer, MCP3428Gain, MCP3428Resolution
 
 MCP3428Sensor = mcp3428_ns.class_(
-    "MCP3428Sensor", sensor.Sensor, cg.PollingComponent, voltage_sampler.VoltageSampler
+    "MCP3428Sensor", sensor.Sensor, cg.PollingComponent
 )
+
+CONF_MCP3428_ID = "mcp3428_id"
+CONF_MULTIPLEXER = "multiplexer"
+CONF_GAIN = "gain"
+CONF_RESOLUTION = "resolution"
 
 CONFIG_SCHEMA = (
     sensor.sensor_schema(
         MCP3428Sensor,
-        unit_of_measurement=UNIT_VOLT,
-        accuracy_decimals=6,
-        device_class=DEVICE_CLASS_VOLTAGE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        accuracy_decimals=0,
+        device_class=None,
+        state_class=None,
     )
     .extend(
         {
             cv.GenerateID(CONF_MCP3428_ID): cv.use_id(MCP3428Component),
-            cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, int=True),
-            cv.Optional(CONF_GAIN, default=1): cv.enum(GAIN, int=True),
-            cv.Optional(CONF_RESOLUTION, default=16): cv.enum(RESOLUTION, int=True),
+            cv.Required(CONF_MULTIPLEXER): cv.enum(MCP3428Multiplexer, upper=True),
+            cv.Required(CONF_GAIN): cv.enum(MCP3428Gain, upper=True),
+            cv.Required(CONF_RESOLUTION): cv.enum(MCP3428Resolution, upper=True),
         }
     )
-    .extend(cv.polling_component_schema("60s"))
+    .extend(cv.polling_component_schema("1s"))
 )
 
-
 async def to_code(config):
-    var = await sensor.new_sensor(config)
+    var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
-    await cg.register_parented(var, config[CONF_MCP3428_ID])
+    await sensor.register_sensor(var, config)
 
     cg.add(var.set_multiplexer(config[CONF_MULTIPLEXER]))
     cg.add(var.set_gain(config[CONF_GAIN]))
     cg.add(var.set_resolution(config[CONF_RESOLUTION]))
+
+    cg.add(var.set_parent(cg.new_Pvariable(config[CONF_MCP3428_ID])))
