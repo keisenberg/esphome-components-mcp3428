@@ -43,7 +43,6 @@ MCP3428Sensor = mcp3428_ns.class_(
 CONFIG_SCHEMA = (
     sensor.sensor_schema(
         MCP3428Sensor,
-        unit_of_measurement="ADC Counts",
         accuracy_decimals=0,
         device_class=None,
         state_class=STATE_CLASS_MEASUREMENT,
