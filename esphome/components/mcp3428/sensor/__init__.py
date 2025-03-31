@@ -51,6 +51,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional("accuracy_decimals", default=0): cv.int_,
         cv.Optional("state_class", default=STATE_CLASS_MEASUREMENT): cv.string,
         cv.Optional("update_interval", default="60s"): cv.update_interval,
+        cv.Optional("filters"): cv.ensure_list(cv.returning_lambda),
     }
 ).extend(cv.polling_component_schema("60s"))
 
