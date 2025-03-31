@@ -50,6 +50,8 @@ class MCP3428Component : public Component, public i2c::I2CDevice {
   void abandon_current_measurement() { single_measurement_active_ = false; }
 
  protected:
+  float convert_answer_to_voltage_(uint8_t const *answer);
+
   uint8_t prev_config_{0};
   uint32_t last_config_write_ms_{0};
   bool continuous_mode_;
