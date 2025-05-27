@@ -1,7 +1,7 @@
 #pragma once
 
-#include "esphome/core/component.h"
 #include "esphome/components/i2c/i2c.h"
+#include "esphome/core/component.h"
 
 namespace esphome {
 namespace mcp3428 {
@@ -44,12 +44,14 @@ class MCP3428Component : public Component, public i2c::I2CDevice {
   // retry or polling.
   bool request_measurement(MCP3428Multiplexer multiplexer, MCP3428Gain gain, MCP3428Resolution resolution,
                            uint32_t &timeout_wait);
-  // poll component for a measurement. Returns true if value is available and sets raw_value to the result.
-  bool poll_result(int32_t &raw_value);
+  // poll component for raw ADC reading. Returns true if value is available and sets raw_value to the result.
+  bool poll_raw_result(int32_t &raw_value);
 
   void abandon_current_measurement() { single_measurement_active_ = false; }
 
  protected:
+  int32_t convert_answer_to_raw_(uint8_t const *answer);
+
   uint8_t prev_config_{0};
   uint32_t last_config_write_ms_{0};
   bool continuous_mode_;

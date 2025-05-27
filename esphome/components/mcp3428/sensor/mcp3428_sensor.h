@@ -16,17 +16,17 @@ class MCP3428Sensor : public sensor::Sensor,
                       public PollingComponent,
                       public Parented<MCP3428Component> {
  public:
+  void update() override;
   void set_multiplexer(MCP3428Multiplexer multiplexer) { this->multiplexer_ = multiplexer; }
   void set_gain(MCP3428Gain gain) { this->gain_ = gain; }
   void set_resolution(MCP3428Resolution resolution) { this->resolution_ = resolution; }
+  // Get raw ADC reading
+  int32_t get_raw_reading();
 
-  void setup() override;
   void dump_config() override;
-  void update() override;
-
-  float sample();
 
  protected:
+  int initial_measurement_request_ms_;
   MCP3428Multiplexer multiplexer_;
   MCP3428Gain gain_;
   MCP3428Resolution resolution_;
