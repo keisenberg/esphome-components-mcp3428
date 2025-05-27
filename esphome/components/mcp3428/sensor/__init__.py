@@ -5,7 +5,6 @@ from esphome.const import (
     CONF_GAIN,
     CONF_MULTIPLEXER,
     CONF_RESOLUTION,
-    DEVICE_CLASS_NONE,
     STATE_CLASS_MEASUREMENT,
 )
 
@@ -47,7 +46,6 @@ CONFIG_SCHEMA = (
         MCP3428Sensor,
         unit_of_measurement="count",
         accuracy_decimals=0,
-        device_class=DEVICE_CLASS_NONE,
         state_class=STATE_CLASS_MEASUREMENT,
     )
     .extend(
